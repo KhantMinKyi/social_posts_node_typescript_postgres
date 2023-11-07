@@ -21,6 +21,6 @@ app.post("/api/login", loginValidator, loginUser);
 app.use(router.use(userAuth));
 app.use("/api/authors", userRouter);
 app.use("/api/posts", postRouter);
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("app is running");
 });
