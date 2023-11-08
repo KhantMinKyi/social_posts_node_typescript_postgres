@@ -2,6 +2,7 @@ import { Request } from "express";
 import { IUser } from "./userInterface";
 
 export interface IPost {
+  id: number | Number;
   title: string | null;
   published?: boolean;
   authorId?: any;

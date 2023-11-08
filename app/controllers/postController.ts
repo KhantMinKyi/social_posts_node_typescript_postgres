@@ -3,10 +3,30 @@ import { NextFunction, Request, Response, response } from "express";
 import { validationResult } from "express-validator";
 import { IPost, IPostRequest } from "../interfaces/postInterface";
 import { parseBoolean } from "../services/parseBoolean";
-import { validateError } from "../validators";
 
 const postClient = new PrismaClient().post;
-
+const userSelectData = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  varified: true,
+};
+const commentSelectData = {
+  id: true,
+  description: true,
+};
+const selectData = {
+  id: true,
+  title: true,
+  published: true,
+  author: {
+    select: userSelectData,
+  },
+  comments: {
+    select: commentSelectData,
+  },
+};
 // get all posts
 export const getAllPost = async (req: IPostRequest, res: Response) => {
   const query = req.query;
@@ -21,18 +41,13 @@ export const getAllPost = async (req: IPostRequest, res: Response) => {
       whereConditions.published = queryboolean;
     }
     const allPosts = await postClient.findMany({
+      select: selectData,
       where: whereConditions,
-      include: {
-        author: true,
-      },
       orderBy: {
         id: "asc",
       },
     });
-    // console.log(postClient);
-    res.status(200).json({
-      data: allPosts,
-    });
+    res.status(200).json(allPosts);
   } catch (error) {
     console.log(error);
   }
@@ -69,7 +84,7 @@ export const createPost = async (
 ) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json(errors.formatWith);
+    return res.status(400).json(errors);
   }
   try {
     const postBody = req.body;

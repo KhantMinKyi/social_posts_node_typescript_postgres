@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import postRouter from "./routes/postRouter";
 import userRouter from "./routes/userRoute";
+import commentRouter from "./routes/commentRoute";
 import { userAuth } from "./middlewares/userAuth";
 import { loginUser } from "./controllers/userController";
 import bodyParser from "body-parser";
@@ -21,6 +22,7 @@ app.post("/api/login", loginValidator, loginUser);
 app.use(router.use(userAuth));
 app.use("/api/authors", userRouter);
 app.use("/api/posts", postRouter);
+app.use("/api/comments", commentRouter);
 app.listen(process.env.PORT, () => {
   console.log("app is running");
 });
