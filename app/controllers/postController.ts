@@ -15,6 +15,7 @@ const userSelectData = {
 const commentSelectData = {
   id: true,
   description: true,
+  userId: true,
 };
 const selectData = {
   id: true,
@@ -61,9 +62,7 @@ export const getPostById = async (req: Request, res: Response) => {
       where: {
         id: Number(postId),
       },
-      include: {
-        author: true,
-      },
+      select: selectData,
     });
     if (!post) {
       return res.status(402).json({
@@ -119,9 +118,7 @@ export const updatePost = async (
     where: {
       id: Number(postId),
     },
-    include: {
-      author: true,
-    },
+    select: selectData,
   });
   // validate if post exist
   if (!post) {
