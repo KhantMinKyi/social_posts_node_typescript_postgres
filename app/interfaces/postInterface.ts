@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { IUser } from "./userInterface";
+import { IComment } from "./commentInterface";
 
 export interface IPost {
   id: number | Number;
@@ -7,6 +8,7 @@ export interface IPost {
   published?: boolean;
   authorId?: any;
   author?: IUser;
+  comment?: IComment;
 }
 
 export interface IPostRequest extends Request {

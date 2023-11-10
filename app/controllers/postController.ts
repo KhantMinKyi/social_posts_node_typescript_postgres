@@ -1,10 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../prisma/generated/client1";
 import { NextFunction, Request, Response, response } from "express";
 import { validationResult } from "express-validator";
 import { IPost, IPostRequest } from "../interfaces/postInterface";
 import { parseBoolean } from "../services/parseBoolean";
-
+import { PrismaClient as PrismaClient2 } from "../../prisma/generated/client2";
 const postClient = new PrismaClient().post;
+const postClient2 = new PrismaClient2().post;
 const userSelectData = {
   id: true,
   name: true,
@@ -32,7 +33,6 @@ const selectData = {
 export const getAllPost = async (req: IPostRequest, res: Response) => {
   const query = req.query;
   const queryboolean = parseBoolean(req.query.published);
-  console.log(typeof queryboolean);
   try {
     const whereConditions: any = {};
     if (query.title) {
@@ -89,7 +89,7 @@ export const createPost = async (
     const postBody = req.body;
     const userId = (req as any).user.id;
 
-    const post: IPost = await postClient.create({
+    const post: IPost = await postClient2.create({
       data: { authorId: userId, ...postBody },
     });
     res.status(200).json({

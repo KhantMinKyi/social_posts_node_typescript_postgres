@@ -9,7 +9,8 @@
     "dev": "tsc-watch --onSuccess \"nodemon ./dist/index.js\"",
     "seed": "ts-node prisma/seed.ts",
     "build": "tsc",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev --schema prisma/schema.prisma; npx prisma migrate dev --schema prisma/schema2.prisma",
+    "prisma": "prisma generate --schema prisma/schema.prisma --watch & prisma generate --schema prisma/schema2.prisma --watch"
   },
   "keywords": [],
   "author": "",

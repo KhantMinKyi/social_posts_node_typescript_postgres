@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
+import { IComment } from "../interfaces/commentInterface";
 
 const prismaClient = new PrismaClient();
 // create Comment
@@ -35,7 +36,7 @@ export const postComment = async (
     });
   }
   try {
-    const comment = await prismaClient.comment.create({
+    const comment: IComment = await prismaClient.comment.create({
       data: data,
     });
     res.status(200).json(comment);
@@ -56,7 +57,7 @@ export const deleteComment = async (
 
   const data = req.body;
   const commentId = req.params.id;
-  const comment = await prismaClient.comment.findFirst({
+  const comment: IComment = await prismaClient.comment.findFirst({
     where: {
       id: Number(commentId),
     },
@@ -69,7 +70,6 @@ export const deleteComment = async (
       message: "Comment id : " + commentId + " Not Found",
     });
   }
-  console.log(comment);
   if (data.userId == comment.userId || data.userId == comment.post.authorId) {
     try {
       await prismaClient.comment.delete({
@@ -104,7 +104,7 @@ export const updateComment = async (
 
   const data = req.body;
   const commentId = req.params.id;
-  const comment = await prismaClient.comment.findFirst({
+  const comment: IComment = await prismaClient.comment.findFirst({
     where: {
       id: Number(commentId),
     },
@@ -114,7 +114,6 @@ export const updateComment = async (
       message: "Comment id : " + commentId + " Not Found",
     });
   }
-  console.log(comment);
   if (data.userId == comment.userId) {
     try {
       await prismaClient.comment.update({
