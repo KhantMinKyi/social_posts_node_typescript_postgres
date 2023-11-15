@@ -1,11 +1,16 @@
 import { PrismaClient } from "../../prisma/generated/client1";
+import { PrismaClient as PrismaClient2 } from "../../prisma/generated/client2";
 import { NextFunction, Request, Response, response } from "express";
 import { validationResult } from "express-validator";
 import { IPost, IPostRequest } from "../interfaces/postInterface";
 import { parseBoolean } from "../services/parseBoolean";
-import { PrismaClient as PrismaClient2 } from "../../prisma/generated/client2";
-const postClient = new PrismaClient().post;
+import { readReplicas } from "@prisma/extension-read-replicas";
 const postClient2 = new PrismaClient2().post;
+const postClient = new PrismaClient().$extends(
+  readReplicas({
+    url: process.env.PSQL2_URL,
+  })
+);
 const userSelectData = {
   id: true,
   name: true,
@@ -22,6 +27,7 @@ const selectData = {
   id: true,
   title: true,
   published: true,
+  // varified: true,
   author: {
     select: userSelectData,
   },
@@ -41,7 +47,7 @@ export const getAllPost = async (req: IPostRequest, res: Response) => {
     if (query.published) {
       whereConditions.published = queryboolean;
     }
-    const allPosts = await postClient.findMany({
+    const allPosts = await postClient.$primary().post.findMany({
       select: selectData,
       where: whereConditions,
       orderBy: {
@@ -58,7 +64,7 @@ export const getAllPost = async (req: IPostRequest, res: Response) => {
 export const getPostById = async (req: Request, res: Response) => {
   try {
     const postId = req.params.id;
-    const post = await postClient.findUnique({
+    const post = await postClient.post.findUnique({
       where: {
         id: Number(postId),
       },
@@ -89,7 +95,7 @@ export const createPost = async (
     const postBody = req.body;
     const userId = (req as any).user.id;
 
-    const post: IPost = await postClient2.create({
+    const post: IPost = await postClient.$primary().post.create({
       data: { authorId: userId, ...postBody },
     });
     res.status(200).json({
@@ -114,7 +120,7 @@ export const updatePost = async (
   const postId = req.params.id;
 
   // find Post
-  const post = await postClient.findUnique({
+  const post = await postClient.post.findUnique({
     where: {
       id: Number(postId),
     },
@@ -128,7 +134,7 @@ export const updatePost = async (
   }
   try {
     // uppdate post
-    const postUpdate = await postClient.update({
+    const postUpdate = await postClient.post.update({
       where: {
         id: Number(postId),
       },
@@ -147,7 +153,7 @@ export const deletePost = async (
   next: NextFunction
 ) => {
   const postId = req.params.id;
-  const post = await postClient.findUnique({
+  const post = await postClient.post.findUnique({
     where: {
       id: Number(postId),
     },
@@ -158,7 +164,7 @@ export const deletePost = async (
     });
   }
   try {
-    await postClient.delete({
+    await postClient.post.delete({
       where: {
         id: Number(postId),
       },
